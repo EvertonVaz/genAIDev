@@ -7,3 +7,6 @@
 [submodule "project3"]
 	path = project3
 	url = git@github.com:EvertonVaz/project3.git
+[submodule "rush_genai"]
+	path = rush_genai
+	url = git@github.com:EvertonVaz/rush_genai.git
