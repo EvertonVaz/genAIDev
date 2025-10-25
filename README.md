@@ -4,29 +4,42 @@ Repositório contendo todos os projetos e exercícios desenvolvidos durante a Im
 
 ## 📋 Índice
 
-- [Sobre a Imersão](#sobre-a-imersão)
-- [Projetos](#projetos)
-  - [Project 1](#project-1)
-  - [Project 2](#project-2)
-  - [Project 3](#project-3)
+- [Sobre a Imersão](#-sobre-a-imersão)
+- [Projetos](#-projetos)
+  - [Project 1 - Fundamentos de Python](#project-1---fundamentos-de-python)
+  - [Project 2 - Engenharia de Prompts e LLMs](#project-2---engenharia-de-prompts-e-llms)
+  - [Project 3 - Chatbots Avançados e RAG](#project-3---chatbots-avançados-e-rag)
   - [Rush GenAI](#rush-genai)
-- [Exercícios e Materiais](#exercícios-e-materiais)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Como Executar](#como-executar)
-- [Estrutura do Repositório](#estrutura-do-repositório)
+- [Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [Aprendizados](#-aprendizados)
+- [Autor](#-autor)
+- [Licença](#-licença)
+- [Agradecimentos](#-agradecimentos)
+
 
 ---
 
 ## 🎯 Sobre a Imersão
 
-A **Imersão GenAI para Desenvolvedores** é um programa intensivo oferecido pela 42 São Paulo focado em Inteligência Artificial Generativa. Durante a imersão, foram desenvolvidos diversos projetos práticos explorando tecnologias de ponta como:
+A **Imersão GenAI para Desenvolvedores** é um programa intensivo oferecido pela **42 São Paulo** focado em Inteligência Artificial Generativa. Durante a imersão, foram desenvolvidos **4 projetos completos** (3 módulos + 1 rush final) explorando tecnologias de ponta e conceitos fundamentais de IA:
 
-- 🤖 Modelos de linguagem (LLMs)
-- 💬 Chatbots inteligentes
-- 🗄️ Bancos de dados vetoriais
-- 🔍 Sistemas de busca semântica (RAG)
-- 🐳 Containerização com Docker
-- 🎨 Interfaces com Streamlit
+### 🎓 Módulos e Aprendizados
+
+- **🐍 Módulo 1 - Fundamentos de Python**: 9 exercícios práticos de Python essenciais
+- **🧠 Módulo 2 - Engenharia de Prompts**: 7 exercícios de técnicas avançadas de prompting
+- **🤖 Módulo 3 - Chatbots e RAG**: 4 exercícios de sistemas conversacionais inteligentes
+- **🚀 Rush Final**: Projeto completo de chatbot com ChromaDB e Streamlit
+
+### 💡 Tecnologias Exploradas
+
+- 🤖 **Large Language Models (LLMs)** - Google Gemini API
+- 💬 **Chatbots Inteligentes** - Persistência e memória de longo prazo
+- 🗄️ **Bancos de Dados Vetoriais** - ChromaDB e embeddings
+- 🔍 **Sistemas RAG** - Retrieval Augmented Generation completo
+- 🐳 **Containerização** - Docker e Ollama
+- 🎨 **Interfaces Web** - Streamlit para aplicações interativas
+- 🗃️ **Persistência** - SQLAlchemy e SQLite
+- ✅ **Validação** - Pydantic e schemas estruturados
 
 ---
 
@@ -407,6 +420,32 @@ Módulo avançado focado em **Chatbots com Memória** e **Retrieval Augmented Ge
 - **Aprendizado:** Implementação completa de sistema RAG profissional
 </details>
 
+<details>
+<summary><b>📊 Arquitetura do Sistema RAG</b></summary>
+
+```mermaid
+graph TD
+    A[📄 Documento TXT<br/>Orbit Motordrones] --> B[🔢 Embeddings<br/>Vetores]
+    B <--> C[💾 Cache<br/>embeddings.pkl]
+    B --> D[❓ Query do Usuário]
+    D --> E[🔍 Busca Semântica<br/>Similaridade Cosine]
+    E --> F[📊 Top-K Contextos<br/>87% threshold]
+    F --> G[📝 Prompt + Contexto]
+    G --> H[🤖 LLM<br/>Google Gemini]
+    H --> I[✅ Resposta Final]
+    style A fill:#e1f5ff,color:#000
+    style B fill:#fff4e1,color:#000
+    style C fill:#f0f0f0,color:#000
+    style D fill:#ffe1f5,color:#000
+    style E fill:#e1ffe1,color:#000
+    style F fill:#ffe1e1,color:#000
+    style G fill:#f5e1ff,color:#000
+    style H fill:#4285f4,color:#000
+    style I fill:#34a853,color:#000
+```
+
+</details>
+
 #### 🎯 Objetivos de Aprendizado
 
 - ✅ **Chatbot Conversacional:** Loop de interação e gestão de contexto
@@ -429,30 +468,6 @@ Módulo avançado focado em **Chatbots com Memória** e **Retrieval Augmented Ge
 - **Database:** SQLite
 - **Cache:** Pickle (serialização Python)
 - **ML Framework:** PyTorch (via sentence-transformers)
-
-#### 📊 Arquitetura do Sistema RAG (ex04)
-
-```mermaid
-graph TD
-    A[📄 Documento TXT<br/>Orbit Motordrones] --> B[🔢 Embeddings<br/>Vetores]
-    B <--> C[💾 Cache<br/>embeddings.pkl]
-    B --> D[❓ Query do Usuário]
-    D --> E[🔍 Busca Semântica<br/>Similaridade Cosine]
-    E --> F[📊 Top-K Contextos<br/>87% threshold]
-    F --> G[📝 Prompt + Contexto]
-    G --> H[🤖 LLM<br/>Google Gemini]
-    H --> I[✅ Resposta Final]
-
-    style A fill:#e1f5ff
-    style B fill:#fff4e1
-    style C fill:#f0f0f0
-    style D fill:#ffe1f5
-    style E fill:#e1ffe1
-    style F fill:#ffe1e1
-    style G fill:#f5e1ff
-    style H fill:#4285f4,color:#fff
-    style I fill:#34a853,color:#fff
-```
 
 #### 🚀 Como Executar
 
@@ -607,77 +622,6 @@ streamlit run rush_genai/main.py
 - ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white) **Git** - Controle de versão
 - **SQLite** - Banco de dados relacional
 - **Ollama** - Modelos locais
-
----
-
-## 🚀 Como Executar
-
-### Pré-requisitos
-
-```bash
-# Python 3.10 ou superior
-python --version
-
-# Git
-git --version
-
-# Docker (opcional)
-docker --version
-```
-
-### Instalação
-
-```bash
-# Clonar repositório com submódulos
-git clone --recursive https://github.com/EvertonVaz/genAIDev.git
-cd genAIDev
-
-# Instalar dependências
-pip install -r requirements.txt
-
-# Configurar variável de ambiente
-cp .env.example .env
-# Editar .env e adicionar sua GOOGLE_API_KEY
-```
-
-### Executar Projetos
-
-```bash
-# Rush GenAI (Chatbot de Filmes)
-streamlit run rush_genai/main.py
-
-# Ollama Local (Módulo 2)
-docker-compose -f subjects/modulo2-docker-compose.yml up -d
-```
-
----
-
-## 📂 Estrutura do Repositório
-
-```
-genAIDev/
-├── project1/              # Submodule - Projeto 1
-├── project2/              # Submodule - Projeto 2
-├── project3/              # Submodule - Projeto 3
-├── rush_genai/            # Submodule - Projeto Principal
-│   ├── chatbot/           # Módulo do chatbot
-│   │   ├── chatbot.py     # Lógica do chatbot
-│   │   ├── database.py    # Camada de dados
-│   │   ├── models.py      # Modelos do banco
-│   │   └── schemas.py     # Schemas Pydantic
-│   ├── chroma_db/         # Banco vetorial
-│   ├── main.py            # App Streamlit
-│   ├── process_json.py    # Processamento de dados
-│   ├── movies.json        # Dataset de filmes
-│   ├── cli.py             # CLI
-│   └── .gitignore         # Arquivos ignorados
-├── subjects/              # Materiais dos módulos
-│   ├── modulo2-docker-compose.yml  # Config Docker Ollama
-│   └── modulo3-orbit_motordrones.txt  # Dataset Orbit
-├── requirements.txt       # Dependências Python
-├── .gitmodules           # Configuração dos submódulos
-└── README.md             # Este arquivo
-```
 
 ---
 
