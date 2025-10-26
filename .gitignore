@@ -3,5 +3,5 @@ venv/
 docker-compose.yml
 **.pkl
 subjectss/
-chroma_db/
-chat_history.db
+**chroma_db**/
+**chat_history.db**
