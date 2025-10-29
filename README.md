@@ -32,14 +32,16 @@ A **Imersão GenAI para Desenvolvedores** é um programa intensivo oferecido pel
 
 ### 💡 Tecnologias Exploradas
 
-- 🤖 **Large Language Models (LLMs)** - Google Gemini API
-- 💬 **Chatbots Inteligentes** - Persistência e memória de longo prazo
-- 🗄️ **Bancos de Dados Vetoriais** - ChromaDB e embeddings
+- 🤖 **Large Language Models (LLMs)** - Google Gemini 2.5 Flash Lite
+- 💬 **Chatbots Inteligentes** - Persistência, memória e roteamento
+- 🗄️ **Bancos de Dados Vetoriais** - ChromaDB com embeddings multilinguais
 - 🔍 **Sistemas RAG** - Retrieval Augmented Generation completo
-- 🐳 **Containerização** - Docker e Ollama
+- 🧭 **Roteamento Inteligente** - Dual-LLM architecture
+- � **Function Calling** - Integração de funções com LLMs
+- �🐳 **Containerização** - Docker e Ollama
 - 🎨 **Interfaces Web** - Streamlit para aplicações interativas
-- 🗃️ **Persistência** - SQLAlchemy e SQLite
-- ✅ **Validação** - Pydantic e schemas estruturados
+- 🗃️ **Persistência** - SQLAlchemy 2.0 e SQLite
+- ✅ **Validação** - Pydantic schemas e type hints
 
 ---
 
@@ -523,84 +525,271 @@ python rag.py "Quem é o CEO da Orbit?"
 > **Status:** ✅ Completo
 > **Repositório:** [EvertonVaz/rush_genai](https://github.com/EvertonVaz/rush_genai)
 
-Projeto principal da imersão: **Velinha da Locadora** 👵 - Um chatbot inteligente de recomendação de filmes.
+Projeto principal da imersão: **Locadora** 👵🎬 - Um chatbot inteligente de recomendação de filmes com sistema de roteamento e RAG.
 
 #### 🎬 Sobre o Projeto
 
-Sistema completo de recomendação de filmes utilizando IA Generativa, banco de dados vetorial (ChromaDB) e persistência de conversas. O chatbot simula uma simpática "velinha" de locadora que conhece bem seu acervo e ajuda usuários a encontrar filmes perfeitos para assistir.
+Sistema completo de recomendação de filmes utilizando IA Generativa, banco de dados vetorial (ChromaDB) e persistência de conversas. O chatbot combina **roteamento inteligente** de conversas, **busca semântica**, **function calling** e **gestão avançada de contexto** para proporcionar recomendações personalizadas e gerenciar preferências do usuário.
 
-#### ⚡ Funcionalidades
+#### ⚡ Funcionalidades Principais
 
+- **🧭 Roteamento Inteligente**: Sistema que classifica intenção (`friendly` ou `movie_suggestion`)
 - **💬 Chatbot Conversacional**: Interface natural com histórico de conversas persistente
-- **🔍 Busca Semântica**: Sistema RAG (Retrieval Augmented Generation) com ChromaDB
-- **📊 Banco de Dados Vetorial**: Embeddings de filmes para busca inteligente
-- **💾 Persistência**: SQLite para histórico de mensagens e preferências do usuário
-- **📝 Resumos Automáticos**: Geração de resumos do histórico de conversas
-- **⭐ Sistema de Favoritos**: Gerenciamento de filmes favoritos do usuário
-- **🎯 Avaliações**: Registro de notas e filmes assistidos
-- **🎨 Interface Web**: Aplicação Streamlit para interação amigável
+- **🔍 Sistema RAG**: Retrieval Augmented Generation com ChromaDB para busca semântica
+- **📊 Embeddings**: Sentence Transformers (`paraphrase-multilingual-MiniLM-L12-v2`)
+- **💾 Persistência Completa**: SQLite para mensagens, resumos e favoritos
+- **📝 Resumos Automáticos**: Geração a cada 10 mensagens (max 120 palavras)
+- **⭐ Sistema de Favoritos**: Adicionar, avaliar e marcar filmes assistidos
+- **🎯 Function Calling**: 7 funções integradas ao LLM
+- **🎨 Interface Streamlit**: Container de chat com altura fixa (300px)
+- **⏱️ Medição de Performance**: Decorator para tracking de tempo de execução
 
-#### 🛠️ Tecnologias
+#### 🛠️ Stack Tecnológica
 
 - **LLM**: Google Gemini 2.5 Flash Lite
-- **Vector DB**: ChromaDB (busca por similaridade)
-- **Backend**: Python, SQLAlchemy, Pydantic
+- **Embeddings**: Sentence Transformers (modelo multilingual)
+- **Vector DB**: ChromaDB (persistente)
+- **ORM**: SQLAlchemy 2.0
+- **Validação**: Pydantic BaseModel
 - **Frontend**: Streamlit
 - **Database**: SQLite
 
-#### 📁 Arquitetura
+#### 📁 Arquitetura Modular
 
 ```
 rush_genai/
 ├── chatbot/
-│   ├── chatbot.py       # Lógica principal do chatbot
-│   ├── database.py      # Repositórios e acesso ao banco
-│   ├── models.py        # Modelos SQLAlchemy
-│   └── schemas.py       # Schemas Pydantic
-├── chroma_db/           # Banco de dados vetorial
-├── main.py              # Aplicação Streamlit
-├── process_json.py      # Processamento e ingestão de dados
-└── movies.json          # Dataset de filmes
+│   ├── chatbot.py           # Classe ChatBot (LLM + Function Calling)
+│   ├── database.py          # MessageRepository + UserRepository
+│   ├── models.py            # Message, Summary, Favorites (SQLAlchemy)
+│   ├── schemas.py           # ResponseData, PromptData, Movie (Pydantic)
+│   ├── prompts.py           # PromptGenerator (roteamento, friendly, movie)
+│   ├── func_declarations.py # 7 declarações de funções para LLM
+│   └── history_manager.py   # HistoryManager (contexto + resumos)
+├── main.py                  # Interface Streamlit
+├── process_json.py          # ProcessJSON (ChromaDB + embeddings)
+├── utils.py                 # Serializers + decorator de timing
+├── movies.json              # Dataset com filmes (ChromaDB source)
+└── chroma_db/               # Banco de dados vetorial persistente
 ```
 
-#### 🎯 Principais Características Técnicas
+#### 🔄 Fluxo de Execução (Pipeline)
 
-1. **Sistema RAG Inteligente**
-   - Busca semântica nos top 3 filmes mais relevantes
-   - Embeddings automáticos com ChromaDB
-   - Context window otimizado para melhor resposta
+1. **Input do Usuário** → Streamlit captura mensagem via `st.chat_input()`
+2. **Update Context** → `HistoryManager` prepara `PromptData` (histórico + resumos + contador)
+3. **Roteamento** → `choose_assistant()` classifica como `friendly` ou `movie_suggestion`
+   - **Simple Model**: Gemini 2.5 Flash Lite (temp=0.0, JSON mode, no thinking)
+4. **Busca RAG** (se movie_suggestion) → ChromaDB retorna top 3 filmes similares
+5. **Geração de Resposta** → Thinking Model gera resposta contextualizada (temp=1.0)
+6. **Function Calling** (opcional) → Executa ações (favoritos, avaliações, etc.)
+7. **Persistência** → Salva mensagem; a cada 10 mensagens gera resumo automático
 
-2. **Gerenciamento de Contexto**
-   - Histórico das últimas 5 mensagens
-   - Resumos automáticos a cada 10 mensagens
-   - Memória de longo prazo através de resumos
+#### 🎯 Características Técnicas Avançadas
 
-3. **Function Calling**
-   - `get_favorites()`: Lista filmes favoritos
-   - `add_to_favorites(movie_id, titulo)`: Adiciona favorito
-   - `set_rating(movie_id, rating)`: Define nota (0-10)
-   - `get_rating(movie_id)`: Consulta nota
-   - `set_watched(movie_id)`: Marca como assistido
-   - `check_watched(movie_id)`: Verifica se assistiu
-   - `exit()`: Encerra conversa
+<details>
+<summary><b>1. Sistema de Roteamento Inteligente</b></summary>
 
-4. **Prompting Avançado**
-   - Persona definida (crítico de cinema experiente e bondoso)
-   - Instruções contextuais detalhadas
-   - Integração de histórico e resumos no prompt
+- **Arquivo:** [`chatbot/prompts.py`](rush_genai/chatbot/prompts.py) → `choose_assistant()`
+- **Funcionamento:**
+  - Analisa histórico para resolver referências ("ela", "esse filme")
+  - Retorna JSON: `{"type": "friendly|movie_suggestion", "text": "query otimizada"}`
+  - Campo `text` otimizado para RAG (inclui título do histórico se houver)
+- **Modelo:** Gemini 2.5 Flash Lite (temp=0.0, sem thinking, JSON mode)
+- **Exemplos:**
+  ```json
+  Input: "filme de animação"
+  Output: {"type":"movie_suggestion","text":"filme animação anime"}
+
+  Input: "adicione ela" (histórico: "Frozen")
+  Output: {"type":"movie_suggestion","text":"Frozen: adicionar aos favoritos"}
+
+  Input: "oi"
+  Output: {"type":"friendly","text":"oi, tudo bem?"}
+  ```
+</details>
+
+<details>
+<summary><b>2. Sistema RAG com ChromaDB</b></summary>
+
+- **Arquivo:** [`process_json.py`](rush_genai/process_json.py)
+- **Embedding Function:** Custom `EmbeddingTextFunction` com cache de modelo
+- **Modelo:** `paraphrase-multilingual-MiniLM-L12-v2` (carregado uma única vez)
+- **Collection:** `movies` (persistente em `./chroma_db`)
+- **Pipeline:**
+  1. Lê [`movies.json`](rush_genai/movies.json) e converte para objetos `Movie`
+  2. Gera embeddings usando `movie_serialize()` (metadados completos)
+  3. Armazena em ChromaDB com IDs únicos (`imdb_id`)
+  4. Query retorna top 3 filmes mais similares
+- **Otimização:** Collection criada apenas uma vez (cache persistente)
+</details>
+
+<details>
+<summary><b>3. Gerenciamento de Contexto Avançado</b></summary>
+
+- **Arquivo:** [`chatbot/history_manager.py`](rush_genai/chatbot/history_manager.py)
+- **Classe:** `HistoryManager`
+- **Funcionalidades:**
+  - `get_chat_history(limit=5)`: Últimas 5 mensagens (user + assistant)
+  - `get_summaries(limit=5)`: Últimos 5 resumos
+  - `update_prompt_data()`: Retorna `PromptData` completo
+- **PromptData Schema:**
+  ```python
+  class PromptData(BaseModel):
+      history: str           # Últimas 5 mensagens
+      summarys: str          # Últimos 5 resumos
+      messages_count: int    # Total de mensagens
+      user_input: str        # Input atual
+  ```
+- **Resumos:** Gerados a cada 10 mensagens (max 120 palavras, sem citar nomes)
+</details>
+
+<details>
+<summary><b>4. Function Calling Integrado</b></summary>
+
+- **Arquivo:** [`chatbot/func_declarations.py`](rush_genai/chatbot/func_declarations.py)
+- **Total:** 7 funções disponíveis
+- **Funções:**
+  | Nome | Parâmetros | Descrição |
+  |------|-----------|-----------|
+  | `exit()` | - | Encerra conversa |
+  | `get_favorites()` | - | Lista filmes favoritos |
+  | `add_to_favorites()` | movie_id, titulo | Adiciona aos favoritos |
+  | `set_rating()` | movie_id, rating (0-10) | Define nota |
+  | `get_rating()` | movie_id | Consulta nota |
+  | `set_watched()` | movie_id | Marca como assistido |
+  | `check_watched()` | movie_id | Verifica se assistiu |
+
+- **Execução:** [`chatbot/chatbot.py`](rush_genai/chatbot/chatbot.py) → `function_call_response()`
+- **Repository:** `UserRepository` gerencia tabela `Favorites`
+</details>
+
+<details>
+<summary><b>5. Estratégia de Prompting</b></summary>
+
+- **Arquivo:** [`chatbot/prompts.py`](rush_genai/chatbot/prompts.py) → `PromptGenerator`
+- **3 Tipos de Prompt:**
+
+**a) Roteamento (`choose_assistant`)**
+- Analisa histórico para resolver referências
+- Otimiza query para RAG
+- Retorna JSON estruturado
+
+**b) Assistente de Filmes (`movie_assistant`)**
+```python
+# Persona: sábia e experiente
+# Max: 60 palavras, tom natural
+# Context: Filmes (top 3 RAG) + Histórico + Resumos
+```
+
+**c) Assistente Amigável (`friendly_assistant`)**
+```python
+# Persona: amigável e sábia
+# Max: 60 palavras
+# Context: Histórico + Resumos (sem filmes)
+```
+</details>
+
+<details>
+<summary><b>6. Persistência e Banco de Dados</b></summary>
+
+- **Arquivo:** [`chatbot/database.py`](rush_genai/chatbot/database.py)
+- **Tabelas SQLite:**
+  - **messages**: Histórico completo (user + assistant)
+  - **summaries**: Resumos automáticos
+  - **favorites**: filme_id, titulo, rating, is_favorite, watching
+
+- **Repositories:**
+  - `MessageRepository`: CRUD de mensagens e resumos
+  - `UserRepository`: Gerenciamento de favoritos e avaliações
+
+- **Schemas Pydantic:**
+  - `MessageData`: role, content
+  - `SummaryData`: content
+  - `UserMovieData`: filme_id, titulo, rating, is_favorite, watching
+</details>
+
+<details>
+<summary><b>7. Modelos LLM e Configurações</b></summary>
+
+- **Arquivo:** [`chatbot/chatbot.py`](rush_genai/chatbot/chatbot.py)
+
+**Simple Model (Roteamento):**
+```python
+model = "gemini-2.5-flash-lite"
+temperature = 0.0
+thinking_budget = 0  # Sem thinking
+response_mime_type = "application/json"
+```
+
+**Thinking Model (Resposta Final):**
+```python
+model = "gemini-2.5-flash-lite"
+temperature = 1.0 (default)
+thinking_budget = -1  # Thinking ilimitado
+tools = function_declarations  # 7 funções
+mode = "AUTO"  # Function calling automático
+```
+
+- **Limpeza de Output:** `_clean_str()` remove markdown code blocks
+- **Medição:** Decorator `@measure_time_execution` em ambos os métodos
+</details>
 
 #### 🚀 Como Executar
 
 ```bash
+# Navegar até o diretório
+cd rush_genai
+
 # Instalar dependências
 pip install -r requirements.txt
 
-# Configurar variável de ambiente
-echo "GOOGLE_API_KEY=sua_chave_aqui" > .env
+# Configurar variável de ambiente (.env)
+echo "GOOGLE_GENAI_API_KEY=sua_chave_aqui" > .env
 
 # Executar aplicação Streamlit
-streamlit run rush_genai/main.py
+streamlit run main.py
 ```
+
+#### 📊 Exemplo de Fluxo Completo
+
+```
+👤 User: "Quero um filme de ficção científica com robôs"
+   └─> HistoryManager prepara PromptData
+
+🧭 Roteamento (simple_model, temp=0.0):
+   └─> {"type":"movie_suggestion","text":"filme ficção científica robôs"}
+
+🔍 ChromaDB RAG:
+   └─> Top 3: ["Ex Machina", "Blade Runner 2049", "I, Robot"]
+
+🤖 Thinking Model (temp=1.0):
+   └─> Resposta: "Que tal 'Ex Machina'? É fascinante sobre IA..." (60 palavras)
+
+💾 Persistência:
+   └─> MessageRepository.add_message(user + assistant)
+
+---
+
+👤 User: "Adicione aos meus favoritos"
+   └─> Roteamento: {"type":"movie_suggestion","text":"Ex Machina: adicionar aos favoritos"}
+
+🔧 Function Calling:
+   └─> add_to_favorites(movie_id="tt0470752", titulo="Ex Machina")
+
+✅ Resposta: "Filme Ex Machina adicionado aos favoritos."
+```
+
+#### 💡 Otimizações Implementadas
+
+- ✅ **Cache de Modelo:** Embedding model carregado uma única vez (singleton)
+- ✅ **ChromaDB Persistente:** Evita reprocessamento do JSON
+- ✅ **Resumos Inteligentes:** Reduz contexto mantendo relevância (120 palavras)
+- ✅ **Roteamento Dual-LLM:** Simple model para classificação rápida (temp=0.0)
+- ✅ **Context Resolution:** Análise de histórico para resolver referências
+- ✅ **Query Optimization:** Campo `text` otimizado para RAG no roteador
+- ✅ **Medição de Performance:** Decorator para tracking de latência
+- ✅ **Validação Pydantic:** Schemas garantem tipagem forte
+- ✅ **Tratamento de Erros:** Limpeza de markdown, JSONDecodeError handling
 
 ---
 
@@ -608,46 +797,83 @@ streamlit run rush_genai/main.py
 
 ### Linguagens e Frameworks
 - ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) **Python 3.10+**
-- ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white) **Streamlit** - Interface web
-- ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=flat&logo=sqlalchemy&logoColor=white) **SQLAlchemy** - ORM
+- ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white) **Streamlit** - Interface web interativa
+- ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=flat&logo=sqlalchemy&logoColor=white) **SQLAlchemy 2.0** - ORM moderno
 
 ### IA e Machine Learning
-- ![Google](https://img.shields.io/badge/Google_Gemini-4285F4?style=flat&logo=google&logoColor=white) **Google Gemini API** - LLM
-- **ChromaDB** - Banco de dados vetorial
-- **Sentence Transformers** - Embeddings
-- **Pydantic** - Validação de dados
+- ![Google](https://img.shields.io/badge/Google_Gemini-4285F4?style=flat&logo=google&logoColor=white) **Google Gemini 2.5 Flash Lite** - LLM principal
+- **ChromaDB** - Banco de dados vetorial (embeddings)
+- **Sentence Transformers** - Embeddings multilinguais (`paraphrase-multilingual-MiniLM-L12-v2`)
+- **Pydantic** - Validação e schemas de dados
+- **PyTorch** - Backend para Sentence Transformers
 
-### Ferramentas
-- ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) **Docker** - Containerização
+### Ferramentas e DevOps
+- ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) **Docker** - Containerização de aplicações
 - ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white) **Git** - Controle de versão
-- **SQLite** - Banco de dados relacional
-- **Ollama** - Modelos locais
+- **SQLite** - Banco de dados relacional embarcado
+- **Ollama** - Execução local de LLMs (opcional)
+- **python-dotenv** - Gerenciamento de variáveis de ambiente
 
 ---
 
 ## 🎓 Aprendizados
 
-Durante esta imersão, foram explorados conceitos fundamentais de IA Generativa:
+Durante esta imersão, foram explorados conceitos fundamentais e avançados de IA Generativa:
 
 ### 1. **Large Language Models (LLMs)**
-- Utilização da API Google Gemini
-- Técnicas de prompting avançado
-- Function calling e ferramentas
+- Utilização da API Google Gemini (2.5 Flash Lite)
+- Técnicas avançadas de prompting (Few-Shot, XML, Role-Play, Chaining)
+- Function calling integrado (declaração e execução de funções)
+- Controle de temperatura e thinking budget
+- Dual-LLM architecture (simple + thinking models)
+- Response modes (JSON, text) e configurações otimizadas
 
 ### 2. **Retrieval Augmented Generation (RAG)**
-- Implementação de busca semântica
-- Uso de bancos de dados vetoriais
-- Embeddings e similaridade
+- Implementação de busca semântica com ChromaDB
+- Pipeline completo: Indexação → Retrieval → Augmentation → Generation
+- Cache persistente de embeddings para performance
+- Threshold adaptativo para relevância (87% da max similarity)
+- Uso de bancos de dados vetoriais em produção
+- Embeddings multilinguais com Sentence Transformers
 
-### 3. **Engenharia de Software**
-- Arquitetura modular e escalável
-- Persistência de dados
-- Boas práticas com Python
+### 3. **Engenharia de Prompts**
+- **Few-Shot Learning**: Ensinar por exemplos
+- **XML Prompting**: Estruturação clara de instruções
+- **Role-Play**: Definição de personas especializadas
+- **Prompt Chaining**: Pipelines multi-etapa
+- **Structured Output**: Validação com Pydantic schemas
+- **Context Resolution**: Resolução de referências em histórico
+- **Query Optimization**: Otimização de queries para RAG
 
-### 4. **DevOps**
-- Containerização com Docker
-- Gerenciamento de dependências
+### 4. **Arquitetura de Software**
+- Arquitetura modular e escalável (separation of concerns)
+- Repository Pattern para abstração de dados
+- Dependency Injection e inversão de controle
+- Schema-driven development com Pydantic
+- Decorators para cross-cutting concerns (timing, caching)
+- Singleton pattern para otimização de recursos
+
+### 5. **Persistência e Bancos de Dados**
+- SQLAlchemy 2.0 com type hints modernos
+- Modelagem de dados para chatbots (mensagens, resumos, favoritos)
+- ChromaDB para armazenamento vetorial persistente
+- Cache de embeddings com pickle
+- Gerenciamento de sessões e transações
+
+### 6. **DevOps e Boas Práticas**
+- Containerização com Docker e Docker Compose
+- Gerenciamento de dependências (Poetry, requirements.txt)
+- Variáveis de ambiente com python-dotenv
 - Versionamento com Git
+- Documentação técnica completa
+- Error handling robusto
+
+### 7. **Performance e Otimização**
+- Cache de modelos para evitar recarregamento
+- Medição de tempo de execução (profiling)
+- Resumos automáticos para redução de contexto
+- Lazy loading de embeddings
+- Otimização de queries vetoriais
 
 ---
 
